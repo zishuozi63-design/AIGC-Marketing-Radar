@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AIGC 竞品洞察 | 极光版</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 全局颜色变量：北欧极简冰雪极光主题 */
+    :root {
+      --bg-dark: #F5F7FA; /* 浅色背景 */
+      --bg-mid: #F0F2F5; /* 更浅的背景 */
+      --card-bg: rgba(255, 255, 255, 0.7); /* 卡片背景改为半透明白色 */
+      --card-border: rgba(120, 150, 200, 0.15); /* 边框改为极浅冷蓝 */
+      --text-primary: #334155; /* 主文本改为深石板灰 */
+      --text-secondary: #64748B; /* 次文本改为中等灰色 */
+      --accent: #60A5FA; /* 主色调改为清新的天蓝色 */
+      --accent-glow: rgba(96, 165, 250, 0.3); /* 蓝色发光 */
+      --accent-soft: #93C5FD; /* 柔和蓝色 */
+      --success: #34D399; /* 成功绿色 */
+      --warning: #FBBF24; /* 警告黄色 */
+      --danger: #EF4444; /* 错误红色 */
+    }
+
+    body {
+      min-height: 100vh;
+      /* 这里是你的背景，使用极光雪山浅色渐变 */
+      background: linear-gradient(135deg, #E0F2F7 0%, #D8EBF3 25%, #EAF5E0 50%, #F5F0E2 75%, #F7F5F5 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+      color: var(--text-primary); /* 使用新的文本颜色 */
+      padding: 2rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 极光动态层调整为浅色透明 */
+    .aurora {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8; /* 增加透明度 */
+      background: 
+        radial-gradient(ellipse at 70% 20%, rgba(180, 220, 255, 0.35), transparent 50%), /* 浅蓝 */
+        radial-gradient(ellipse at 30% 80%, rgba(180, 255, 200, 0.25), transparent 60%), /* 浅绿 */
+        radial-gradient(ellipse at 90% 70%, rgba(255, 200, 240, 0.18), transparent 55%); /* 浅粉 */
+      filter: blur(80px); /* 增加模糊度 */
+    }
+
+    /* 雪山轮廓也调整为浅色系 */
+    .mountains {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 240px;
+      z-index: 0;
+      opacity: 0.35; /* 增加透明度 */
+      background: repeating-linear-gradient(transparent, transparent 180px, rgba(255,255,255,0.05) 180px, rgba(255,255,255,0.1) 190px);
+      backdrop-filter: blur(5px); /* 增加模糊 */
+      pointer-events: none;
+    }
+    .mountains::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(120deg, rgba(200,220,240,0.4) 0%, rgba(220,240,255,0.2) 40%, transparent 80%);
+      clip-path: polygon(0% 100%, 5% 70%, 12% 85%, 20% 50%, 28% 75%, 35% 45%, 45% 70%, 55% 40%, 68% 65%, 80% 35%, 92% 60%, 100% 30%, 100% 100%);
+    }
+
+    /* 主容器 */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 头部 */
+    .header {
+      margin-bottom: 2.5rem;
+      text-align: left;
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.4); /* 头部背景也变浅 */
+      border-radius: 2rem;
+      padding: 1.5rem 2rem;
+      border: 1px solid rgba(200,200,200,0.2); /* 边框变浅 */
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); /* 浅阴影 */
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(96, 165, 250, 0.12); /* 徽章背景 */
+      backdrop-filter: blur(4px);
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--accent-soft);
+      margin-bottom: 1rem;
+      border: 1px solid rgba(96, 165, 250, 0.3); /* 徽章边框 */
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #334155 0%, #64748B 100%); /* 标题文字渐变 */
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      line-height: 1.4;
+    }
+
+    /* 左右两栏 */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.8rem;
+    }
+
+    /* 左侧控制区 */
+    .control-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      border: 1px solid var(--card-border);
+      padding: 1.8rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15); /* 浅阴影 */
+      transition: all 0.2s ease;
+    }
+
+    .control-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 500;
+      color: var(--accent-soft);
+      margin-bottom: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.8rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      background: rgba(255,255,255,0.3); /* 输入框背景变浅 */
+      border-radius: 1.5rem;
+      border: 1px solid rgba(120,150,200,0.2); /* 输入框边框 */
+      padding: 0.6rem 1.2rem;
+      transition: all 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(96,165,250,0.3); /* 聚焦阴影 */
+    }
+
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    input::placeholder {
+      color: rgba(100,116,139,0.7); /* 提示文字颜色 */
+      font-weight: 400;
+    }
+
+    .btn-primary {
+      background: linear-gradient(105deg, var(--accent) 0%, #4B8CF0 100%); /* 按钮渐变色 */
+      border: none;
+      border-radius: 2rem;
+      padding: 0.9rem 1.5rem;
+      width: 100%;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.15); /* 按钮阴影 */
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1); /* 亮度提升 */
+      box-shadow: 0 8px 20px rgba(96,165,250,0.4); /* 按钮悬停阴影 */
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    .helper {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 1rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1rem;
+    }
+
+    /* 右侧卡片区 */
+    .insight-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 1.8rem;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 12px 25px -10px rgba(0,0,0,0.1); /* 浅阴影 */
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.2); /* 悬停阴影 */
+    }
+
+    .card-header {
+      padding: 1rem 1.5rem 0.5rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      background: rgba(96,165,250,0.1); /* 徽章背景 */
+      color: var(--accent-soft);
+    }
+    .card-body {
+      padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+      max-height: 380px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      font-size: 0.9rem;
+    }
+    /* 滚动条美化 */
+    .card-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .card-body::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+    }
+    .card-body::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    /* 内容格式增强 */
+    .card-body h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary); /* 标题颜色 */
+      margin: 0.8rem 0 0.3rem 0;
+      border-left: 3px solid var(--accent);
+      padding-left: 10px;
+    }
+    .card-body p {
+      margin: 0.6rem 0;
+    }
+    .card-body ul, .card-body ol {
+      margin: 0.4rem 0 0.6rem 1.2rem;
+    }
+    .card-body li {
+      margin: 0.2rem 0;
+    }
+    .card-body strong {
+      color: var(--accent-soft);
+    }
+
+    .skeleton-line {
+      height: 8px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.2), rgba(255,255,255,0.08)); /* 骨架屏颜色 */
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 70%; }
+    .skeleton-line.long { width: 95%; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(255,255,255,0.8); /* Toast背景变浅 */
+      backdrop-filter: blur(20px);
+      border-radius: 40px;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      border: 1px solid rgba(200,200,200,0.3); /* Toast边框变浅 */
+      transition: all 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 1rem; }
+      .dashboard { grid-template-columns: 1fr; gap: 1rem; }
+      h1 { font-size: 2rem; }
+      .card-body { max-height: 320px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="mountains"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="badge">
+        <span>⚡ RAG INTELLIGENCE</span>
+      </div>
+      <h1>AIGC 竞品洞察<br>与营销雷达</h1>
+      <div class="sub">基于真实数据集与多源舆情，自动挖掘痛点、生成迭代建议、输出小红书爆款文案 + 视觉提示词</div>
+    </div>
+
+    <div class="dashboard">
+      <!-- 左侧控制区 -->
+      <div class="control-panel">
+        <div class="control-title">🔍 分析目标</div>
+        <div class="input-group">
+          <label>产品类型 / 细分场景</label>
+          <div class="input-wrapper">
+            <input type="text" id="productInput" placeholder="例：AI海报设计软件 · 面向大学生" value="AI海报设计软件">
+          </div>
+        </div>
+        <button class="btn-primary" id="launchBtn">
+          <span>✨</span> 启动深度洞察
+        </button>
+        <div class="helper">
+          ⚡ 支持中英文 | 自动融合小红书、应用商店、Twitter 舆情
+        </div>
+      </div>
+
+      <!-- 右侧卡片区 -->
+      <div class="insight-cards">
+        <!-- 痛点卡片 -->
+        <div class="card" id="cardPain">
+          <div class="card-header">
+            <div class="card-title">📍 核心痛点挖掘</div>
+            <div class="card-badge">User Voice · 360°</div>
+          </div>
+          <div class="card-body" id="painPlaceholder">
+            <p>加载用户反馈中...</p>
+            <p>将自动从多渠道聚合真实用户吐槽与隐性需求</p>
+          </div>
+        </div>
+        <!-- 迭代建议卡片 -->
+        <div class="card" id="cardOpt">
+          <div class="card-header">
+            <div class="card-title">🔄 产品迭代建议</div>
+            <div class="card-badge">Impact × Effort</div>
+          </div>
+          <div class="card-body" id="optPlaceholder">
+            <p>等待分析...</p>
+            <p>基于痛点自动生成高价值迭代方向</p>
+          </div>
+        </div>
+        <!-- 营销文案 + MJ提示词卡片 -->
+        <div class="card" id="cardXhs">
+          <div class="card-header">
+            <div class="card-title">📸 小红书文案 & MJ 提示词</div>
+            <div class="card-badge">Creative Copilot</div>
+          </div>
+          <div class="card-body" id="xhsPlaceholder">
+            <p>准备就绪</p>
+            <p>将生成爆款文案框架及 Midjourney 视觉提示</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span id="toastMsg">已连接洞察引擎</span></div>
+
+  <script>
+    (function() {
+      const input = document.getElementById('productInput');
+      const launchBtn = document.getElementById('launchBtn');
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg'); 
+
+      const painDiv = document.getElementById('painPlaceholder');
+      const optDiv = document.getElementById('optPlaceholder');
+      const xhsDiv = document.getElementById('xhsPlaceholder');
+
+      let isRunning = false;
+
+      function showToast(msg, isError = false) {
+        toastMsg.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3000);
+      }
+
+      function setLoading(loading) {
+        if (loading) {
+          painDiv.innerHTML = '<div class="skeleton-line long"></div><div class="skeleton-line medium"></div><div class="skeleton-line short"></div>';
+          optDiv.innerHTML = '<div class="skeleton-line long"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div>';
+          xhsDiv.innerHTML = '<div class="skeleton-line long"></div><div class="skeleton-line medium"></div><div class="skeleton-line medium"></div>';
+        } else {
+          painDiv.innerHTML = '';
+          optDiv.innerHTML = '';
+          xhsDiv.innerHTML = '';
+        }
+      }
+
+      function formatMarkdown(text) {
+        if (!text) return '';
+        let formatted = text
+          .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+          .replace(/^## (.*)$/gm, '<h2 style="font-size:1rem; font-weight:600; margin-top:0.5rem;">$1</h2>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^[\-\*] (.*)$/gm, '<li>$1</li>')
+          .replace(/^\d+\. (.*)$/gm, '<li>$1</li>');
+        if (formatted.includes('<li>')) {
+          formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+        }
+        formatted = formatted.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+        return `<p>${formatted}</p>`;
+      }
+
+      function renderCard(container, rawText) {
+        const safe = rawText || '暂无数据';
+        const html = formatMarkdown(safe);
+        container.innerHTML = html;
+      }
+
+      // --- 这是你唯一的、终极的渲染函数 ---
+      function renderInsights(data) {
+        // 1. 打印原始数据到浏览器控制台（按 F12 就能看到）
+        console.log("收到后端数据:", data);
+
+        // 2. 暴力提取：不管后端给的是大写、小写、还是拼写变体，全部兼容！
+        const painContent = data.Product_Insight || data.Product_insight || data.product_insight || "";
+        const optContent = data.Optimization || data.optimization || "";
+        const xhsContent = data.Xiaohongshu_Copy || data.xiaohongshu_copy || "";
+        const mjContent = data.MJ_Prompts || data.mj_prompts || "";
+
+        // 3. 放弃全局变量，直接在渲染时重新抓取 DOM，防止变量未定义的错误
+        const targetPain = document.getElementById('painPlaceholder');
+        const targetOpt = document.getElementById('optPlaceholder');
+        const targetXhs = document.getElementById('xhsPlaceholder');
+
+        // 4. 渲染第一张卡片
+        if (targetPain) {
+          renderCard(targetPain, painContent || "⚠️ 后端已返回，但内容为空");
+        }
+
+        // 5. 渲染第二张卡片
+        if (targetOpt) {
+          renderCard(targetOpt, optContent || "⚠️ 后端已返回，但内容为空");
+        }
+
+        // 6. 渲染第三张卡片
+        if (targetXhs) {
+          const combined = [xhsContent, mjContent].filter(Boolean).join('\n\n---\n\n');
+          renderCard(targetXhs, combined || "⚠️ 营销文案生成失败");
+        }
+
+        console.log("网页渲染指令已下达！");
+      }
+      // --- 渲染函数结束 ---
+
+      async function fetchInsight(productName) {
+        const proxy = 'http://localhost:3000/api/chat'; // 调用本地代理服务器
+        const res = await fetch(proxy, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productName })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (json.ok === false) throw new Error(json.error || '服务端错误');
+        return json;
+      }
+
+      launchBtn.addEventListener('click', async () => {
+        if (isRunning) return;
+        const product = input.value.trim() || 'AI海报设计软件';
+        isRunning = true;
+        launchBtn.disabled = true;
+        launchBtn.innerHTML = '<span>⏳</span> 正在生成洞察...';
+        setLoading(true);
+        showToast(`启动对「${product}」的深度洞察`);
+
+        try {
+          const data = await fetchInsight(product);
+          setLoading(false);
+          renderInsights(data);
+          showToast('洞察已生成，请查看右侧卡片');
+        } catch (err) {
+          setLoading(false);
+          painDiv.innerHTML = `<p style="color:#ff8a7a;">请求失败: ${err.message}</p><p>请确保代理服务已启动 (node server.js)</p>`;
+          optDiv.innerHTML = '<p>请稍后重试</p>';
+          xhsDiv.innerHTML = '<p>请稍后重试</p>';
+          showToast('请求失败，检查后端服务', true);
+        } finally {
+          isRunning = false;
+          launchBtn.disabled = false;
+          launchBtn.innerHTML = '<span>✨</span> 启动深度洞察';
+        }
+      });
+
+      // 回车触发
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') launchBtn.click();
+      });
+    })();
+  </script>
+</body>
+</html>

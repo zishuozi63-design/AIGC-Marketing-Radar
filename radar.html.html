@@ -531,7 +531,7 @@
       // --- 渲染函数结束 ---
 
       async function fetchInsight(productName) {
-        const proxy = 'http://localhost:3000/api/chat'; // 调用本地代理服务器
+        const proxy =  '/api/chat';
         const res = await fetch(proxy, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

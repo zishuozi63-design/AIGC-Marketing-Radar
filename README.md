@@ -5,12 +5,12 @@
 > 基于 RAG 架构与 Node.js BFF 层，打通小红书 UGC 数据闭环的垂直场景 AI 洞察工具。
 > 
 > 🔗 **[点击此处查看完整 PRD 文档与操作演示视频]https://docs.qq.com/doc/DUmFtc250cHpFeXhj **
-
+**[点击此处查看完整b站演示视频] https://b23.tv/NsjIoOF**
 ---
 
 ## 📸 产品界面展示
 
-*(请在这里插入一张你的极光网页高清截图)*
+
 
 
 <img width="2449" height="1362" alt="屏幕截图 2026-04-06 153239" src="https://github.com/user-attachments/assets/a5e62e47-ec23-4ef7-8de0-850157a36419" />
